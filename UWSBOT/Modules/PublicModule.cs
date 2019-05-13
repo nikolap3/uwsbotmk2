@@ -1,10 +1,8 @@
 ﻿using Discord;
 using Discord.Commands;
 using System;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using UWSBOT.Services;
 
 namespace UWSBOT.Modules
 {
@@ -22,7 +20,7 @@ namespace UWSBOT.Modules
                 {
                     st = i;
                     temp = "";
-                    for (int j = si; j < st-1; j++)
+                    for (int j = si; j < st - 1; j++)
                     {
                         temp += msg[j];
                     }
@@ -31,11 +29,11 @@ namespace UWSBOT.Modules
                     bmsg1[bmsg1.Length - 1] = temp;
                     Console.WriteLine("delovi su " + temp);
                 }
-                else if(msg[i]=='@' && ((i+1<msg.Length)?msg[i+1]=='e':false))
+                else if (msg[i] == '@' && ((i + 1 < msg.Length) ? msg[i + 1] == 'e' : false))
                 {
                     st = i;
                     temp = ";";
-                    for (int j = si; j < st-1; j++)
+                    for (int j = si; j < st - 1; j++)
                     {
                         temp += msg[j];
                     }
@@ -61,15 +59,15 @@ namespace UWSBOT.Modules
             for (int i = 1; i < bmsg1.Length; i++)
             {
                 Array.Resize(ref msg1, msg1.Length + 1);
-                temp = bmsg1[i-1];
-                msg1[i - 1] = (((i==1)?false:temp[0]==';')?" ":"<") + bmsg1[i].ToString();
+                temp = bmsg1[i - 1];
+                msg1[i - 1] = (((i == 1) ? false : temp[0] == ';') ? " " : "<") + bmsg1[i].ToString();
                 temp = msg1[i - 1];
                 if (temp[1] == ';')
                     si = i;
             }
-            if(si>0)
+            if (si > 0)
             {
-                msg1[si-1] = msg1[si - 1].Replace(";", "");
+                msg1[si - 1] = msg1[si - 1].Replace(";", "");
             }
             return msg1;
         }
@@ -132,11 +130,11 @@ namespace UWSBOT.Modules
         }
     }
 
-
     // Modules must be public and inherit from an IModuleBase
     public class PublicModule : ModuleBase<SocketCommandContext>
     {
         #region
+
         [Command("countdown", RunMode = RunMode.Async)]
         public async Task CountdownAsync([Remainder] string msg)
         {
@@ -150,10 +148,10 @@ namespace UWSBOT.Modules
 
             await ReplyAsync(" Countdown over");
         }
-
         [Command("coin")]
         public async Task CoinAsync([Remainder] string msg)
         {
+            if (msg == " " || msg == null) return;
             Random random = new Random();
             string newmsg = "";
             int randomNumber = random.Next(0, 2);
@@ -179,16 +177,22 @@ namespace UWSBOT.Modules
 
                     await ReplyAsync(newmsg.ToString());
                 }
-            else
-            {
-                if (randomNumber == 1) msg = "Heads";
-                else msg = "Tails";
-                newmsg = newmsg + msg + "\n";
-                await ReplyAsync(msg.ToString());
-            }
+        }
+        [Command("coin")]
+        public async Task CoinAsync()
+        {
+            Random random = new Random();
+            string msg = "";
+            int randomNumber = random.Next(0, 2);
+
+            if (randomNumber == 1) msg = "Heads";
+            else msg = "Tails";
+            msg = msg + "\n";
+            await ReplyAsync(msg.ToString());
+
         }
 
-        [Command("team")]
+        [Command("team", RunMode = RunMode.Async)]
         public async Task TeamAsync([Remainder] string msg)
         {
             string newmsg = "";
@@ -219,6 +223,229 @@ namespace UWSBOT.Modules
 
             }
 
+            await ReplyAsync(newmsg);
+        }
+
+        [Command("rps")]
+        public async Task RPSAsync([Remainder] string msg)
+        {
+            string newmsg = "";
+
+            msg = msg.Replace("rps ", "");
+            Random random = new Random();
+            int randomNumber = random.Next(0, 3);
+            string[] names = Pings.Split(msg);
+            int[] threw = new int[names.Length];
+
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                randomNumber = random.Next(0, 3);
+                switch (randomNumber)
+                {
+                    case 0:
+                        threw[i] = randomNumber;
+                        newmsg = newmsg + names[i] + ": :v: \n";
+                        break;
+                    case 1:
+                        threw[i] = randomNumber;
+                        newmsg = newmsg + names[i] + ": :fist: \n";
+                        break;
+                    case 2:
+                        threw[i] = randomNumber;
+                        newmsg = newmsg + names[i] + ": :hand_splayed: \n";
+                        break;
+                }
+                Console.WriteLine((i + "" + threw[i]).ToString());
+            }
+
+            int win = 0;
+            int winnie = 0;
+            Console.WriteLine(("\nlenght je" + names.Length).ToString());
+            for (int i = 0; i < names.Length; i++)
+            {
+                win = 0;
+                for (int j = 0; j < names.Length; j++)
+                {
+                    if (i == j) continue;
+                    if (threw[i] == 1 && threw[j] == 0)
+                    {
+                        win++;
+                        if (win == names.Length - 1) winnie = i + 1;
+                    }
+                    else if (threw[i] == 2 && threw[j] == 1)
+                    {
+                        win++;
+                        if (win == names.Length - 1) winnie = i + 1;
+                    }
+                    else if (threw[i] == 0 && threw[j] == 2)
+                    {
+                        win++;
+                        if (win == names.Length - 1) winnie = i + 1;
+                    }
+
+                }
+            }
+            Console.WriteLine(("\ntrenutni winnie je " + winnie).ToString());
+            if (winnie != 0) newmsg = newmsg + names[winnie - 1] + " WINS";
+            else if (winnie == 0 && win != 0) newmsg += "NO ONE WINS";
+            else newmsg += "NO RESULT";
+            await ReplyAsync(newmsg);
+        }
+
+        [Command("dice")]
+        public async Task DiceAsync([Remainder] string msg)
+        {
+            int min, max;
+            Random random = new Random();
+            int randomNumber = random.Next(0, 2);
+            msg = msg.Replace("u!dice", "");
+            string msg1 = Regex.Match(msg, @"-?\d+").Value;
+            max = int.Parse(msg1);
+            var regex = new Regex(Regex.Escape(max.ToString()));
+            msg = regex.Replace(msg, "", 1);
+            Console.WriteLine("msg je " + msg);
+            if (int.TryParse(msg, out int number2)) min = number2;
+            else min = 1;
+            if (min == max) Console.WriteLine("Min i Max su isti");
+            else if (min > max) { int klog = min; min = max; max = klog; }
+            Console.WriteLine("Min je " + min + " ,a max je " + max);
+            randomNumber = random.Next(min, max + 1);
+            await ReplyAsync("<@" + Context.User.Id + "> " + " rolled " + randomNumber.ToString());
+        }
+
+        [Command("slap")]
+        public async Task SlapAsync([Remainder] string msg)
+        {
+            IUser iuser;
+            string title = "";
+            msg = msg.Replace("u!slap", "");
+            Random random = new Random();
+            int randomNumber = random.Next(0, 3);
+            string[] names = Pings.Split(msg);
+            Console.WriteLine("msg je " + msg);
+            if (names.Length > 0) names[0] = names[0].Replace("!", "");
+            if (names.Length == 0 || names[0] == ("<@" + (Context.User.Id).ToString() + ">").ToString())
+                title = Context.User.Username + " slaps themself";
+            else
+            {
+                Console.WriteLine("id pre prerade je " + names[0]);
+                names[0] = names[0].Remove(0, 2);
+                names[0] = names[0].Replace(">", "");
+                ulong.TryParse(names[0], out ulong result);
+                iuser = await Context.Channel.GetUserAsync(result);
+                Console.WriteLine(result.ToString());
+                title = Context.User.Username + " slaps " + iuser.Username + " ";
+            }
+            string[] gif = new string[0];
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494144313404555274/giphy.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494147027064717322/3b3c291b732c757fc2a9d0f18d34402e37349b73_hq.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494147468787843092/original.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494147323169865728/tumblr_mflza5vE4o1r72ht7o2_400.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494147192068767744/never_ending_bitch_slap_by_yindragon-d4kiubr.gif");
+            randomNumber = random.Next(0, gif.Length);
+            Console.WriteLine(gif.Length.ToString());
+            var builder = new EmbedBuilder().WithTitle(title).WithImageUrl(gif[randomNumber]);
+            var embed = builder.Build();
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("slap")]
+        public async Task SlapAsync()
+        {
+            string msg = " ";
+            string title = "";
+            msg = msg.Replace("u!slap", "");
+            Random random = new Random();
+            int randomNumber = random.Next(0, 3);
+            string[] names = Pings.Split(msg);
+            Console.WriteLine("msg je " + msg);
+            title = Context.User.Username + " slaps themself";
+            string[] gif = new string[0];
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494144313404555274/giphy.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494147027064717322/3b3c291b732c757fc2a9d0f18d34402e37349b73_hq.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494147468787843092/original.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494147323169865728/tumblr_mflza5vE4o1r72ht7o2_400.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494147192068767744/never_ending_bitch_slap_by_yindragon-d4kiubr.gif");
+            randomNumber = random.Next(0, gif.Length);
+            Console.WriteLine(gif.Length.ToString());
+            var builder = new EmbedBuilder().WithTitle(title).WithImageUrl(gif[randomNumber]);
+            var embed = builder.Build();
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("kick")]
+        public async Task KickAsync()
+        {
+            string msg = " "; 
+            string title = "";
+            msg = msg.Replace("u!kick", "");
+            Random random = new Random();
+            int randomNumber = random.Next(0, 3);
+            string[] names = Pings.Split(msg);
+            Console.WriteLine("msg je " + msg);
+            if (names.Length > 0) names[0] = names[0].Replace("!", "");
+            title = Context.User.Username + " kicks themself";
+            string[] gif = new string[0];
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494562631588511744/kick5.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494562673619369994/kick1.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494562720549568512/kick2.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494577333576138763/kick3.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494562816133431296/kick4.gif");
+            randomNumber = random.Next(0, gif.Length);
+            Console.WriteLine(gif.Length.ToString());
+            var builder = new EmbedBuilder().WithTitle(title).WithImageUrl(gif[randomNumber]);
+            var embed = builder.Build();
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("kick")]
+        public async Task KickAsync([Remainder]string msg)
+        {
+            string user = Context.User.Username;
+            ulong iD = Context.User.Id;
+            IUser iuser;
+            string title = "";
+            msg = msg.Replace("u!kick", "");
+            Random random = new Random();
+            int randomNumber = random.Next(0, 3);
+            string[] names = Pings.Split(msg);
+            Console.WriteLine("msg je " + msg);
+            if (names.Length > 0) names[0] = names[0].Replace("!", "");
+            if (names.Length == 0 || names[0] == ("<@" + (iD).ToString() + ">").ToString())
+                title = user + " kicks themself";
+            else
+            {
+                names[0] = names[0].Remove(0, 2);
+                names[0] = names[0].Replace(">", "");
+                ulong.TryParse(names[0], out ulong result);
+                iuser = await Context.Channel.GetUserAsync(result);
+                title = user + " kicks " + iuser.Username + " ";
+            }
+            string[] gif = new string[0];
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494562631588511744/kick5.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494562673619369994/kick1.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494562720549568512/kick2.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494577333576138763/kick3.gif");
+            gif = Pings.add(gif, "https://cdn.discordapp.com/attachments/316675507628539905/494562816133431296/kick4.gif");
+            randomNumber = random.Next(0, gif.Length);
+            Console.WriteLine(gif.Length.ToString());
+            var builder = new EmbedBuilder().WithTitle(title).WithImageUrl(gif[randomNumber]);
+            var embed = builder.Build();
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("help")]
+        public async Task HelpAsync()
+        {
+            string newmsg = "```u!countdown <number> - counts down from a number \n\n"
+                   + "u!rps < player 1 > < player 2 >...... [player n] - plays a rock, paper, scissors game with all the players\n\n"
+                   + "u!coin[number] - flips a coin x times\n "
+                   + "u!team < person 1 >< person 2 > ..........[person n] - makes teams of 2 with all the people mentioned\n\n"
+                   + "u!dice < number 1 >[number 2] - randomly chooses a number from 1 to number1 or a number in between number1 and number2 \n\n"
+                   + "u!slap <person1> - slaps\n\n"
+                   + "u!kick <person1> - kick a guy\n\n\n"
+                   + "<something> -are necessary inputs \n[something] -are optional inputs```";
             await ReplyAsync(newmsg);
         }
         #endregion
