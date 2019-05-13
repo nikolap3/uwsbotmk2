@@ -37,7 +37,7 @@ namespace UWSBOT
                 .AddSingleton<HttpClient>()
                 .AddSingleton<PictureService>()
                 .BuildServiceProvider();
-            using (services)
+            try
             {
                 var client = services.GetRequiredService<DiscordSocketClient>();
 
@@ -53,6 +53,10 @@ namespace UWSBOT
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
 
                 await Task.Delay(-1);
+            }
+            finally
+            {
+                services.Dispose();
             }
         }
 
