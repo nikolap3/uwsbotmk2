@@ -30,14 +30,7 @@ namespace UWSBOT
             // when you are finished using it, at the end of your app's lifetime.
             // If you use another dependency injection framework, you should inspect
             // its documentation for the best way to do this.
-            var services = new ServiceCollection()
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
-                .AddSingleton<HttpClient>()
-                .AddSingleton<PictureService>()
-                .BuildServiceProvider();
-            try
+            using (var services = ConfigureServices())
             {
                 var client = services.GetRequiredService<DiscordSocketClient>();
 
@@ -54,10 +47,6 @@ namespace UWSBOT
 
                 await Task.Delay(-1);
             }
-            finally
-            {
-                services.Dispose();
-            }
         }
 
         private Task LogAsync(LogMessage log)
@@ -66,8 +55,8 @@ namespace UWSBOT
 
             return Task.CompletedTask;
         }
-        /*
-        private ServiceProvider ConfigureServices()
+
+        public ServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
                 .AddSingleton<DiscordSocketClient>()
@@ -76,6 +65,6 @@ namespace UWSBOT
                 .AddSingleton<HttpClient>()
                 .AddSingleton<PictureService>()
                 .BuildServiceProvider();
-        }*/
+        }
     }
 }
