@@ -56,7 +56,7 @@ namespace UWSBOT
             return Task.CompletedTask;
         }
 
-        private ServiceProvider ConfigureServices()
+        public ServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
                 .AddSingleton<DiscordSocketClient>()
