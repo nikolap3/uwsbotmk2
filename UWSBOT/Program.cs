@@ -30,13 +30,14 @@ namespace UWSBOT
             // when you are finished using it, at the end of your app's lifetime.
             // If you use another dependency injection framework, you should inspect
             // its documentation for the best way to do this.
-            using (var services = new ServiceCollection()
+            var services = new ServiceCollection()
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
                 .AddSingleton<HttpClient>()
                 .AddSingleton<PictureService>()
-                .BuildServiceProvider())
+                .BuildServiceProvider();
+            using (services)
             {
                 var client = services.GetRequiredService<DiscordSocketClient>();
 
