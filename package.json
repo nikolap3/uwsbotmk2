@@ -1,0 +1,12 @@
+{
+    "name": "Test",
+    "description": "Test",
+    "version": "0.0.0",
+    "main": "Program.cs",
+    "scripts": {
+        "start": "dotnet Program.cs"
+    },
+    "dependencies": {
+        "discord.net": "2.0.1"
+    }
+}
