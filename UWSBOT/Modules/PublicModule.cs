@@ -134,7 +134,43 @@ namespace UWSBOT.Modules
     public class PublicModule : ModuleBase<SocketCommandContext>
     {
         #region
+        [Command("assign")]
+        public async Task AssignmentAsync([Remainder] string msg)
+        {
+            int i = 0,ni=0;
+            string[] listings = new string[1];
+            while(msg[i]!=null)
+            {
+                if(msg[i]!=';')
+                {
+                    listings[ni] += msg[i];
+                }
+                else
+                {
+                    if(i<msg.Length-1)
+                        if(msg[i+1]!=';')
+                            Array.Resize(ref listings,ni+1);
+                }
+                i++;
+            }
 
+            string[] names = new string[listings.Length / 2 + 1];
+            string[] archetypes = new string[listings.Length / 2 + 1];
+
+            for(i=0;i<listings.Length/2;i++)
+            {
+                names[i]+=listings[i];
+                archetypes[i]+=listings[listings.Length-1-i];
+            }
+            new Random().Shuffle(names);
+            new Random().Shuffle(archetypes);
+            string newmsg = "";
+            for(i=0;i<names.Length;i+=2)
+            {
+                newmsg += names[i] +" gets "+ archetypes[i] +"\n";
+            }
+            await ReplyAsync(newmsg);
+        }
         [Command("countdown", RunMode = RunMode.Async)]
         public async Task CountdownAsync([Remainder] string msg)
         {
