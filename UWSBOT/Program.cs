@@ -31,7 +31,7 @@ namespace UWSBOT
             // If you use another dependency injection framework, you should inspect
             // its documentation for the best way to do this.
            
-            using (ServiceProvider services = ConfigureServices())
+            using (ServiceProvider services = ConfigureServices)
             {
                 var client = services.GetRequiredService<DiscordSocketClient>();
 
@@ -57,17 +57,20 @@ namespace UWSBOT
             return Task.CompletedTask;
         }
 
-        public ServiceProvider ConfigureServices()
+        public ServiceProvider ConfigureServices
         {
-            ServiceProvider djole = new ServiceCollection()
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
-                .AddSingleton<HttpClient>()
-                .AddSingleton<PictureService>()
-                .BuildServiceProvider(); ;
+            get
+            {
+                ServiceProvider djole = new ServiceCollection()
+                    .AddSingleton<DiscordSocketClient>()
+                    .AddSingleton<CommandService>()
+                    .AddSingleton<CommandHandlingService>()
+                    .AddSingleton<HttpClient>()
+                    .AddSingleton<PictureService>()
+                    .BuildServiceProvider(); ;
 
-            return djole;
+                return djole;
+            }
         }
     }
 }
