@@ -31,7 +31,7 @@ namespace UWSBOT
             // If you use another dependency injection framework, you should inspect
             // its documentation for the best way to do this.
            
-            using (ServiceProvider services = ConfigureServices)
+            using (ServiceProvider services = ConfigureServices())
             {
                 var client = services.GetRequiredService<DiscordSocketClient>();
 
@@ -40,7 +40,8 @@ namespace UWSBOT
 
                 // Tokens should be considered secret data and never hard-coded.
                 // We can read from the environment variable to avoid hardcoding.
-                await client.LoginAsync(TokenType.Bot, "NDk0NTIwMDY0NDIzNDkzNjMy.XNg2FQ.ANyHel9r9NoAFnxyOBbBDRjfK9k");
+                string token = Environment.GetEnvironmentVariable("Discord_Token");
+                await client.LoginAsync(TokenType.Bot, token);
                 await client.StartAsync();
 
                 // Here we initialize the logic required to register our commands.
@@ -57,20 +58,17 @@ namespace UWSBOT
             return Task.CompletedTask;
         }
 
-        public ServiceProvider ConfigureServices
+        private ServiceProvider ConfigureServices()
         {
-            get
-            {
-                ServiceProvider djole = new ServiceCollection()
-                    .AddSingleton<DiscordSocketClient>()
-                    .AddSingleton<CommandService>()
-                    .AddSingleton<CommandHandlingService>()
-                    .AddSingleton<HttpClient>()
-                    .AddSingleton<PictureService>()
-                    .BuildServiceProvider(); ;
+            ServiceProvider djole = new ServiceCollection()
+                .AddSingleton<DiscordSocketClient>()
+                .AddSingleton<CommandService>()
+                .AddSingleton<CommandHandlingService>()
+                .AddSingleton<HttpClient>()
+                .AddSingleton<PictureService>()
+                .BuildServiceProvider(); ;
 
-                return djole;
-            }
+            return djole;
         }
     }
 }
